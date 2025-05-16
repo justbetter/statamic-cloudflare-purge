@@ -2,13 +2,13 @@
 
 namespace JustBetter\StatamicCloudflarePurge\Listeners;
 
-use Illuminate\Support\Facades\Storage;
+use JustBetter\StatamicCloudflarePurge\Facades\CloudflarePurge;
 use Statamic\Events\UrlInvalidated;
 
 class UrlInvalidatedListener
 {
     public function handle(UrlInvalidated $event): void
     {
-        Storage::disk('local')->append('/.cloudflare-invalidate-urls', $event->url);
+        CloudflarePurge::appendInvalidateUrl($event->url);
     }
 }
