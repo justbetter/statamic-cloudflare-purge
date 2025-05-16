@@ -5,6 +5,7 @@ namespace JustBetter\StatamicCloudflarePurge\Integrations;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use JustBetter\StatamicCloudflarePurge\Exceptions\CloudflareException;
+use Statamic\Facades\Site;
 
 class Cloudflare
 {
@@ -37,7 +38,7 @@ class Cloudflare
             return true;
         }
 
-        $zoneID = value(config('cloudflare-purge.zone'));
+        $zoneID = $this->getZone();
         if (! $zoneID) {
             return false;
         }
@@ -61,5 +62,16 @@ class Cloudflare
     public function purgeEverything(): bool
     {
         return $this->purge(everything: true);
+    }
+
+    public function getZone(): ?string
+    {
+        $zone = config('cloudflare-purge.zone');
+
+        if (is_array($zone)) {
+            return $zone[Site::current()->handle];
+        }
+
+        return value($zone);
     }
 }

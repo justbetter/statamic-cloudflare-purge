@@ -1,84 +1,66 @@
-# Addon that hooks into the statamic invalidation process and purges cloudflare caches
+# Statamic Cloudflare Purge
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/jade-gg/statamic-cloudflare-purge.svg?style=flat-square)](https://packagist.org/packages/jade-gg/statamic-cloudflare-purge)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/jade-gg/statamic-cloudflare-purge/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/jade-gg/statamic-cloudflare-purge/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/jade-gg/statamic-cloudflare-purge/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/jade-gg/statamic-cloudflare-purge/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/jade-gg/statamic-cloudflare-purge.svg?style=flat-square)](https://packagist.org/packages/jade-gg/statamic-cloudflare-purge)
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/statamic-cloudflare-purge.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/statamic-cloudflare-purge)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+This addon will hook into your already existing statamic invalidation and purge any pages that have been invalidated from your Cloudflare cache.
 
 ## Installation
 
-You can install the package via composer:
-
-```bash
-composer require jade-gg/statamic-cloudflare-purge
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="statamic-cloudflare-purge-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="statamic-cloudflare-purge-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="statamic-cloudflare-purge-views"
+```sh
+composer require justbetter/statamic-cloudflare-purging
 ```
 
 ## Usage
 
+You need a Cloudflare API key with the `Zone.Cache Purge` permission, and set it in your `.env`:
+
+```dotenv
+CLOUDFLARE_API_TOKEN="token_here"
+```
+
+You will also have to define the zone of your website:
+
+```dotenv
+CLOUDFLARE_ZONE="zone_id_here"
+```
+
+If you have a multistore setup with multiple zones, see the [Configuration](#configuration) section.
+
+This package listens to the `UrlInvalidated` event and adds every invalidated URL to a temp file.
+
+Then, when you run the `statamic:cloudflare:purge` command or the `PurgeCloudflareCaches` job, these files will get purged from the Cloudflare cache. As such, you should add this to your scheduler like so:
+
 ```php
-$statamicCloudflarePurge = new JustBetter\StatamicCloudflarePurge();
-echo $statamicCloudflarePurge->echoPhrase('Hello, JustBetter!');
+Schedule::job(\JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCaches::class)->everyMinute()
 ```
 
-## Testing
+## Configuration
 
-```bash
-composer test
+You can publish the config with the following command:
+
+```sh
+php artisan vendor:publish --provider="JustBetter\StatamicCloudflarePurge\StatamicCloudflarePurgeServiceProvider"
 ```
 
-## Changelog
+### Multiple zones
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+Using the configuration file you can define multiple zones. You have 3 ways of defining the zone in your config:
 
-## Contributing
+```php
+// Single zone
+'zone' => 'zone_id',
+```
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+```php
+// Multiple zones based on statamic site handles
+'zone' => [
+    'default' => 'zone_id_default',
+    'french' => 'zone_id_french',
+    ...
+],
+```
 
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
-## Credits
-
-- [Jade Geels](https://github.com/jade-gg)
-- [All Contributors](../../contributors)
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+```php
+// Complete freedom with a callback
+'zone' => function() {
+    return \App\Facades\Custom::getCloudflareZone()
+},
+```
