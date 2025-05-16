@@ -22,7 +22,7 @@ class StatamicCloudflarePurgeServiceProvider extends AddonServiceProvider
     protected function bootCommands(): static
     {
         $this->commands([
-            PurgeCommand::class
+            PurgeCommand::class,
         ]);
 
         return $this;
@@ -30,7 +30,7 @@ class StatamicCloudflarePurgeServiceProvider extends AddonServiceProvider
 
     protected function bootConfig(): static
     {
-        $this->mergeConfigFrom(__DIR__ . '../config/cloudflare-purge.php', 'cloudflare-purge');
+        $this->mergeConfigFrom(__DIR__.'../config/cloudflare-purge.php', 'cloudflare-purge');
 
         return $this;
     }
@@ -45,7 +45,7 @@ class StatamicCloudflarePurgeServiceProvider extends AddonServiceProvider
     protected function bootPublishables(): static
     {
         $this->publishes([
-            __DIR__ . '../config/cloudflare-purge.php' => config_path('cloudflare-purge.php'),
+            __DIR__.'../config/cloudflare-purge.php' => config_path('cloudflare-purge.php'),
         ]);
 
         return $this;

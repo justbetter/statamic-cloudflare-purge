@@ -9,16 +9,16 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use JustBetter\StatamicCloudflarePurge\Integrations\Cloudflare;
 
-class PurgeCloudflareCaches implements ShouldQueue, ShouldBeUnique
+class PurgeCloudflareCaches implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 
     public function __construct(protected Cloudflare $cloudflare) {}
 
-    public function handle(bool $all = false)
+    public function handle(bool $all = false): void
     {
         $files = explode("\n", Storage::disk('local')->get('/.cloudflare-invalidate-urls'));
-        $files = Arr::where($files, fn($file) => $file);
+        $files = Arr::where($files, fn ($file) => $file);
 
         Storage::disk('local')->delete('/.cloudflare-invalidate-urls');
 

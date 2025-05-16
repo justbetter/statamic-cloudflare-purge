@@ -43,7 +43,7 @@ class Cloudflare
             return false;
         }
 
-        $response = $this->http()->post('zones/' . $zoneID . '/purge_cache', $options)->json();
+        $response = $this->http()->post('zones/'.$zoneID.'/purge_cache', $options)->json();
 
         $success = $response['success'] ?? false;
         $errors = $response['errors'] ?? [];
