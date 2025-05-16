@@ -2,12 +2,12 @@
 
 namespace JustBetter\StatamicCloudflarePurge\Listeners;
 
-use JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCaches;
+use JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCachesJob;
 
 class FlushCacheListener
 {
     public function handle($event): void
     {
-        PurgeCloudflareCaches::dispatch(true);
+        PurgeCloudflareCachesJob::dispatch(true);
     }
 }

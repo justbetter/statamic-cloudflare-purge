@@ -7,16 +7,16 @@ use Illuminate\Foundation\Queue\Queueable;
 use JustBetter\StatamicCloudflarePurge\Facades\CloudflarePurge;
 use JustBetter\StatamicCloudflarePurge\Integrations\Cloudflare;
 
-class PurgeCloudflareCaches implements ShouldQueue
+class PurgeCloudflareCachesJob implements ShouldQueue
 {
     use Queueable;
 
     public function __construct(public bool $all = false) {}
 
-    public function handle(): void
+    public function handle(Cloudflare $cloudflare): void
     {
         $files = CloudflarePurge::popInvalidateUrls();
 
-        app(Cloudflare::class)->purge(everything: $this->all, files: $files);
+        $cloudflare->purge(everything: $this->all, files: $files);
     }
 }

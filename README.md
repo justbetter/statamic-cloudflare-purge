@@ -26,10 +26,10 @@ If you have a multistore setup with multiple zones, see the [Configuration](#con
 
 This package listens to the `UrlInvalidated` event and adds every invalidated URL to a temp file. It also listens to certain events as defined in the config file to flush the whole cache.
 
-Then, when you run the `statamic:cloudflare:purge` command or the `PurgeCloudflareCaches` job, these files will get purged from the Cloudflare cache. As such, you should add this to your `routes/console.php` like so:
+Then, when you run the `statamic:cloudflare:purge` command or the `PurgeCloudflareCachesJob` job, these files will get purged from the Cloudflare cache. As such, you should add this to your `routes/console.php` like so:
 
 ```php
-Schedule::job(\JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCaches::class)->everyFiveSeconds()->withoutOverlapping()
+Schedule::job(\JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCachesJob::class)->everyFiveSeconds()->withoutOverlapping()
 ```
 
 ## Configuration

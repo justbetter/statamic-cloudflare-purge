@@ -3,7 +3,7 @@
 namespace JustBetter\StatamicCloudflarePurge\Commands;
 
 use Illuminate\Console\Command;
-use JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCaches;
+use JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCachesJob;
 
 class PurgeCommand extends Command
 {
@@ -11,7 +11,7 @@ class PurgeCommand extends Command
 
     public $description = 'Purge the invalidated cloudflare cache';
 
-    public function __construct(protected PurgeCloudflareCaches $purgeCloudflareCachesJob)
+    public function __construct(protected PurgeCloudflareCachesJob $purgeCloudflareCachesJob)
     {
         parent::__construct();
     }
@@ -21,7 +21,7 @@ class PurgeCommand extends Command
         if ($this->option('all')) {
             $this->purgeCloudflareCachesJob->all = true;
         }
-        
+
         $this->purgeCloudflareCachesJob->handle();
 
         return static::SUCCESS;
