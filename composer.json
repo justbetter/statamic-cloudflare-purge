@@ -2,11 +2,11 @@
     "name": "justbetter/statamic-cloudflare-purge",
     "description": "Addon that hooks into the statamic invalidation process and purges cloudflare caches",
     "keywords": [
-        "Jade Geels",
-        "laravel",
-        "statamic-cloudflare-purge"
+        "statamic",
+        "cloudflare",
+        "caching"
     ],
-    "homepage": "https://github.com/jade-gg/statamic-cloudflare-purge",
+    "homepage": "https://github.com/justbetter/statamic-cloudflare-purge",
     "license": "MIT",
     "authors": [
         {
