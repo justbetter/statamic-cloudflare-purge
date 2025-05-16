@@ -15,6 +15,10 @@ class PurgeCloudflareCachesJob implements ShouldQueue
 
     public function handle(Cloudflare $cloudflare): void
     {
+        if (!config('cloudflare-purge.enabled')) {
+            return;
+        }
+        
         $files = CloudflarePurge::popInvalidateUrls();
 
         $cloudflare->purge(everything: $this->all, files: $files);

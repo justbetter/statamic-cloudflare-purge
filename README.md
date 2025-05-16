@@ -22,6 +22,12 @@ You will also have to define the zone of your website:
 CLOUDFLARE_ZONE="zone_id_here"
 ```
 
+Finally, enable the package:
+
+```dotenv
+CLOUDFLARE_PURGING_ENABLED=true
+```
+
 If you have a multistore setup with multiple zones, see the [Configuration](#configuration) section.
 
 This package listens to the `UrlInvalidated` event and adds every invalidated URL to a temp file. It also listens to certain events as defined in the config file to flush the whole cache.

@@ -3,53 +3,34 @@
 namespace JustBetter\StatamicCloudflarePurge;
 
 use Illuminate\Support\Facades\Event;
-use JustBetter\StatamicCloudflarePurge\Commands\PurgeCommand;
 use JustBetter\StatamicCloudflarePurge\Listeners\FlushCacheListener;
-use JustBetter\StatamicCloudflarePurge\Listeners\UrlInvalidatedListener;
-use Statamic\Events\UrlInvalidated;
 use Statamic\Providers\AddonServiceProvider;
 
 class StatamicCloudflarePurgeServiceProvider extends AddonServiceProvider
 {
-    public function boot(): void
+    public function bootAddon(): void
     {
         $this
-            ->bootCommands()
             ->bootConfig()
-            ->bootListeners()
-            ->bootPublishables();
+            ->bootListeners();
     }
 
-    protected function bootCommands(): static
-    {
-        $this->commands([
-            PurgeCommand::class,
-        ]);
-
-        return $this;
-    }
 
     protected function bootConfig(): static
     {
         $this->mergeConfigFrom(__DIR__.'/../config/cloudflare-purge.php', 'cloudflare-purge');
+        $this->publishes([
+            __DIR__.'/../config/cloudflare-purge.php' => config_path('cloudflare-purge.php'),
+        ]);
 
         return $this;
     }
 
     protected function bootListeners(): static
     {
-        Event::listen(UrlInvalidated::class, UrlInvalidatedListener::class);
-
-        Event::listen(config('cloudflare-purge.flush-events'), FlushCacheListener::class);
-
-        return $this;
-    }
-
-    protected function bootPublishables(): static
-    {
-        $this->publishes([
-            __DIR__.'/../config/cloudflare-purge.php' => config_path('cloudflare-purge.php'),
-        ]);
+        if (config('cloudflare-purge.enabled')) {
+            Event::listen(config('cloudflare-purge.flush-events'), FlushCacheListener::class);
+        }
 
         return $this;
     }
