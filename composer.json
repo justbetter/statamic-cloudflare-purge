@@ -49,14 +49,8 @@
         }
     },
     "scripts": {
-        "test": "phpunit",
         "analyse": "phpstan",
         "style": "pint --test",
-        "quality": [
-            "@test",
-            "@analyse",
-            "@style"
-        ],
         "fix-style": "pint"
     },
     "minimum-stability": "stable",
