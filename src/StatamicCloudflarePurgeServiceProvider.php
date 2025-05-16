@@ -4,7 +4,11 @@ namespace JustBetter\StatamicCloudflarePurge;
 
 use Illuminate\Support\Facades\Event;
 use JustBetter\StatamicCloudflarePurge\Commands\PurgeCommand;
+use JustBetter\StatamicCloudflarePurge\Listeners\FlushCacheListener;
 use JustBetter\StatamicCloudflarePurge\Listeners\UrlInvalidatedListener;
+use Statamic\Events\GlobalSetSaved;
+use Statamic\Events\NavSaved;
+use Statamic\Events\StaticCacheCleared;
 use Statamic\Events\UrlInvalidated;
 use Statamic\Providers\AddonServiceProvider;
 
@@ -38,6 +42,15 @@ class StatamicCloudflarePurgeServiceProvider extends AddonServiceProvider
     protected function bootListeners(): static
     {
         Event::listen(UrlInvalidated::class, UrlInvalidatedListener::class);
+
+        Event::listen(
+            [
+                GlobalSetSaved::class,
+                NavSaved::class,
+                StaticCacheCleared::class,
+            ],
+            FlushCacheListener::class
+        );
 
         return $this;
     }
