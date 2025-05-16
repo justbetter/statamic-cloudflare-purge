@@ -24,12 +24,12 @@ CLOUDFLARE_ZONE="zone_id_here"
 
 If you have a multistore setup with multiple zones, see the [Configuration](#configuration) section.
 
-This package listens to the `UrlInvalidated` event and adds every invalidated URL to a temp file.
+This package listens to the `UrlInvalidated` event and adds every invalidated URL to a temp file. It also listens to certain events as defined in the config file to flush the whole cache.
 
-Then, when you run the `statamic:cloudflare:purge` command or the `PurgeCloudflareCaches` job, these files will get purged from the Cloudflare cache. As such, you should add this to your scheduler like so:
+Then, when you run the `statamic:cloudflare:purge` command or the `PurgeCloudflareCaches` job, these files will get purged from the Cloudflare cache. As such, you should add this to your `routes/console.php` like so:
 
 ```php
-Schedule::job(\JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCaches::class)->everyMinute()
+Schedule::job(\JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCaches::class)->everyFiveSeconds()->withoutOverlapping()
 ```
 
 ## Configuration
@@ -42,7 +42,7 @@ php artisan vendor:publish --provider="JustBetter\StatamicCloudflarePurge\Statam
 
 ### Multiple zones
 
-Using the configuration file you can define multiple zones. You have 3 ways of defining the zone in your config:
+Using the configuration file you can define multiple zones. There are 3 ways of defining the zone in your config:
 
 ```php
 // Single zone
@@ -63,4 +63,16 @@ Using the configuration file you can define multiple zones. You have 3 ways of d
 'zone' => function() {
     return \App\Facades\Custom::getCloudflareZone()
 },
+```
+
+### Cache flushing
+
+You can define any events that will trigger a full cache purge immediately in the config file. By default, these three events have been defined for this purpose:
+
+```php
+'flush-events' => [
+    \Statamic\Events\GlobalSetSaved::class,
+    \Statamic\Events\NavSaved::class,
+    \Statamic\Events\StaticCacheCleared::class,
+],
 ```

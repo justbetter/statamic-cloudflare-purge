@@ -11,7 +11,7 @@ class PurgeCloudflareCaches implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(protected bool $all = false) {}
+    public function __construct(public bool $all = false) {}
 
     public function handle(): void
     {
