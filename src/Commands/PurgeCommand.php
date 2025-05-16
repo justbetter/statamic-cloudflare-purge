@@ -21,7 +21,7 @@ class PurgeCommand extends Command
         if ($this->option('all')) {
             $this->purgeCloudflareCachesJob->all = true;
         }
-        
+
         $this->purgeCloudflareCachesJob->handle();
 
         return static::SUCCESS;
