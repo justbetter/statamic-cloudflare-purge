@@ -15,7 +15,6 @@ class StatamicCloudflarePurgeServiceProvider extends AddonServiceProvider
             ->bootListeners();
     }
 
-
     protected function bootConfig(): static
     {
         $this->mergeConfigFrom(__DIR__.'/../config/cloudflare-purge.php', 'cloudflare-purge');

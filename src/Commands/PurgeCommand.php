@@ -13,8 +13,9 @@ class PurgeCommand extends Command
 
     public function handle(): int
     {
-        if (!config('cloudflare-purge.enabled')) {
+        if (! config('cloudflare-purge.enabled')) {
             $this->info('Purging has been disabled.');
+
             return static::FAILURE;
         }
 
