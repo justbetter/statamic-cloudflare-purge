@@ -18,7 +18,7 @@ class PurgeCommand extends Command
 
     public function handle(): int
     {
-        $this->purgeCloudflareCachesJob->handle($this->hasOption('all'));
+        $this->purgeCloudflareCachesJob->handle(boolval($this->option('all')));
 
         return static::SUCCESS;
     }

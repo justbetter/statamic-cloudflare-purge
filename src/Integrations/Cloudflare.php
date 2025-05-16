@@ -40,7 +40,7 @@ class Cloudflare
 
         $zoneID = $this->getZone();
         if (! $zoneID) {
-            return false;
+            throw new CloudflareException('No zone ID found');
         }
 
         $response = $this->http()->post('zones/'.$zoneID.'/purge_cache', $options)->json();
