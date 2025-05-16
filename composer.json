@@ -6,7 +6,7 @@
         "laravel",
         "statamic-cloudflare-purge"
     ],
-    "homepage": "https://github.com/jade-gg/statamic-cloudflare-purge",
+    "homepage": "https://github.com/justbetter/statamic-cloudflare-purge",
     "license": "MIT",
     "authors": [
         {
