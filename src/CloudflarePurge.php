@@ -10,6 +10,7 @@ class CloudflarePurge
     public static function getInvalidateUrls()
     {
         $files = explode("\n", Storage::disk('local')->get('/.cloudflare-invalidate-urls'));
+
         return Arr::where($files, fn ($file) => $file);
     }
 

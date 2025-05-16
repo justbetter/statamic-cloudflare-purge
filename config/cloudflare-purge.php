@@ -10,5 +10,5 @@ return [
         \Statamic\Events\GlobalSetSaved::class,
         \Statamic\Events\NavSaved::class,
         \Statamic\Events\StaticCacheCleared::class,
-    ]
+    ],
 ];
