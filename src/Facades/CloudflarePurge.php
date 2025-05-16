@@ -9,13 +9,13 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getInvalidateUrls():
  * @method static array popInvalidateUrls():
  * @method static void clearInvalidateUrls():
- * 
+ *
  * @see \JustBetter\StatamicCloudflarePurge\CloudflarePurge
  */
 class CloudflarePurge extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'cloudflare-purge';
+        return \JustBetter\StatamicCloudflarePurge\CloudflarePurge::class;
     }
 }
