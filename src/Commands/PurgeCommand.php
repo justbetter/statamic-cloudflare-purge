@@ -11,7 +11,10 @@ class PurgeCommand extends Command
 
     public $description = 'Purge the invalidated cloudflare cache';
 
-    public function __construct(protected PurgeCloudflareCaches $purgeCloudflareCachesJob) {}
+    public function __construct(protected PurgeCloudflareCaches $purgeCloudflareCachesJob)
+    {
+        parent::__construct();
+    }
 
     public function handle(): int
     {
