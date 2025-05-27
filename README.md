@@ -5,7 +5,7 @@ This addon will hook into your already existing statamic invalidation and purge 
 ## Installation
 
 ```sh
-composer require justbetter/statamic-cloudflare-purging
+composer require justbetter/statamic-cloudflare-purge
 ```
 
 ## Usage
