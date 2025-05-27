@@ -38,6 +38,9 @@ Then, when you run the `statamic:cloudflare:purge` command or the `PurgeCloudfla
 Schedule::job(\JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCachesJob::class)->everyFiveSeconds()->withoutOverlapping();
 ```
 
+> [!NOTE]
+> Be aware of the [rate limits on the API](https://developers.cloudflare.com/cache/how-to/purge-cache/#availability-and-limits). You're *probably* not going to run into any issues, but it's possible. Especially if you end up calling an everything-purge often and you're on a free plan, or have a lot of sites running on the same Cloudflare account.
+
 ## Configuration
 
 You can publish the config with the following command:
