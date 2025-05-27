@@ -35,7 +35,7 @@ This package listens to the `UrlInvalidated` event and adds every invalidated UR
 Then, when you run the `statamic:cloudflare:purge` command or the `PurgeCloudflareCachesJob` job, these files will get purged from the Cloudflare cache. As such, you should add this to your `routes/console.php` like so:
 
 ```php
-Schedule::job(\JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCachesJob::class)->everyFiveSeconds()->withoutOverlapping()
+Schedule::job(\JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCachesJob::class)->everyFiveSeconds()->withoutOverlapping();
 ```
 
 ## Configuration
