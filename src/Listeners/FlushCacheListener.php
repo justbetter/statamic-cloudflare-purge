@@ -10,7 +10,7 @@ class FlushCacheListener
     public function handle($event): void
     {
         CloudflarePurge::appendZone();
-        
+
         PurgeCloudflareCachesJob::dispatch(true);
     }
 }

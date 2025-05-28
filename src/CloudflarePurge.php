@@ -38,22 +38,22 @@ class CloudflarePurge
         }
 
         Storage::disk('local')->append(static::getStoragePath($zone), $url);
-        
+
         static::appendZone($zone);
     }
 
     public static function getStoragePath(?string $zone = null): string
     {
-        if (!$zone) {
+        if (! $zone) {
             $zone = static::getCurrentZone();
         }
-        
-        return '/.cloudflare-invalidate-urls-' . $zone;
+
+        return '/.cloudflare-invalidate-urls-'.$zone;
     }
 
     public static function appendZone(?string $zone = null): void
     {
-        if (!$zone) {
+        if (! $zone) {
             $zone = static::getCurrentZone();
         }
 
@@ -66,7 +66,7 @@ class CloudflarePurge
 
     public static function removeZone(?string $zone = null): void
     {
-        if (!$zone) {
+        if (! $zone) {
             $zone = static::getCurrentZone();
         }
 

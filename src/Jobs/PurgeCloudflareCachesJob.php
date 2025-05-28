@@ -21,7 +21,7 @@ class PurgeCloudflareCachesJob implements ShouldQueue
 
         foreach (CloudflarePurge::getZones() as $zone) {
             $files = CloudflarePurge::popInvalidateUrls($zone);
-            
+
             $cloudflare->purge($zone, everything: $this->all, files: $files);
         }
     }
