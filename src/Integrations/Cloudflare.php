@@ -5,7 +5,6 @@ namespace JustBetter\StatamicCloudflarePurge\Integrations;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use JustBetter\StatamicCloudflarePurge\Exceptions\CloudflareException;
-use Statamic\Facades\Site;
 
 class Cloudflare
 {
@@ -15,7 +14,7 @@ class Cloudflare
             ->withToken(config('cloudflare-purge.token'));
     }
 
-    public function purge(?array $files = null, ?array $tags = null, ?array $hosts = null, bool $everything = false): bool
+    public function purge(string $zone, ?array $files = null, ?array $tags = null, ?array $hosts = null, bool $everything = false): bool
     {
         $options = [];
 
@@ -38,12 +37,11 @@ class Cloudflare
             return true;
         }
 
-        $zoneID = $this->getZone();
-        if (! $zoneID) {
-            throw new CloudflareException('No zone ID found');
+        if (! $zone) {
+            throw new CloudflareException('No zone ID');
         }
 
-        $response = $this->http()->post('zones/'.$zoneID.'/purge_cache', $options)->json();
+        $response = $this->http()->post('zones/'.$zone.'/purge_cache', $options)->json();
 
         $success = $response['success'] ?? false;
         $errors = $response['errors'] ?? [];
@@ -59,19 +57,8 @@ class Cloudflare
         return $success;
     }
 
-    public function purgeEverything(): bool
+    public function purgeEverything(string $zone): bool
     {
-        return $this->purge(everything: true);
-    }
-
-    public function getZone(): ?string
-    {
-        $zone = config('cloudflare-purge.zone');
-
-        if (is_array($zone)) {
-            return $zone[Site::current()->handle];
-        }
-
-        return value($zone);
+        return $this->purge($zone, everything: true);
     }
 }
