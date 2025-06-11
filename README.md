@@ -1,3 +1,7 @@
+<a href="https://github.com/justbetter/statamic-cloudflare-purge" title="JustBetter">
+    <img src="./art/banner.svg" alt="Banner">
+</a>
+
 # Statamic Cloudflare Purge
 
 This addon will hook into your already existing statamic invalidation and purge any pages that have been invalidated from your Cloudflare cache.
