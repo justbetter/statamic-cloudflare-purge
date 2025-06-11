@@ -1,3 +1,7 @@
-# Changelog
+# Changelog 
 
-All notable changes to `statamic-cloudflare-purge` will be documented in this file.
+[Unreleased changes](https://github.com/justbetter/statamic-cloudflare-purge/compare/1.0.0...1.0.0)
+## [1.0.0](https://github.com/justbetter/statamic-cloudflare-purge/releases/tag/1.0.0) - 2025-06-11
+
+Initial release
+
