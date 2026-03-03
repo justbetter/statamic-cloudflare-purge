@@ -3,6 +3,7 @@
 namespace JustBetter\StatamicCloudflarePurge\Integrations;
 
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use JustBetter\StatamicCloudflarePurge\Exceptions\CloudflareException;
 
@@ -31,6 +32,9 @@ class Cloudflare
                 $options['hosts'] = $hosts;
             }
         }
+
+        // Filter out non-arrays and empty arrays
+        $options = Arr::where($options, fn ($option) => is_array($option) && count($option));
 
         // No need to continue when there's nothing to purge
         if (! count($options)) {
