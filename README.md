@@ -6,6 +6,12 @@
 
 This addon will hook into your already existing statamic invalidation and purge any pages that have been invalidated from your Cloudflare cache.
 
+## Requirements
+
+* PHP ^8.3
+* Laravel ^12.0
+* Statamic ^6.7
+
 ## Installation
 
 ```sh

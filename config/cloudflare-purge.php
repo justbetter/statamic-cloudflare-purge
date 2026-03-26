@@ -1,5 +1,9 @@
 <?php
 
+use Statamic\Events\GlobalSetSaved;
+use Statamic\Events\NavSaved;
+use Statamic\Events\StaticCacheCleared;
+
 return [
     'enabled' => env('CLOUDFLARE_PURGING_ENABLED', false),
     'endpoint' => env('CLOUDFLARE_API_ENDPOINT', 'https://api.cloudflare.com/client/v4'),
@@ -8,8 +12,8 @@ return [
 
     // The events that, when dispatched, will cause the full cache to be purged
     'flush-events' => [
-        \Statamic\Events\GlobalSetSaved::class,
-        \Statamic\Events\NavSaved::class,
-        \Statamic\Events\StaticCacheCleared::class,
+        GlobalSetSaved::class,
+        NavSaved::class,
+        StaticCacheCleared::class,
     ],
 ];
