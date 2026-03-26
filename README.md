@@ -10,7 +10,7 @@ This addon will hook into your already existing statamic invalidation and purge 
 
 * PHP ^8.3
 * Laravel ^12.0
-* Statamic ^6.3
+* Statamic ^6.7
 
 ## Installation
 
