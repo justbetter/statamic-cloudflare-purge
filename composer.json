@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": "^8.3",
+        "justbetter/statamic-base": "^1.0",
         "statamic/cms": "^6.0"
     },
     "require-dev": {
