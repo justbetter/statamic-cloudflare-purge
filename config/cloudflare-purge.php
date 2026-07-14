@@ -16,4 +16,10 @@ return [
         NavSaved::class,
         StaticCacheCleared::class,
     ],
+
+    'rate-limits' => [
+        'single-file' => [
+            'per-request' => env('CLOUDFLARE_RATE_LIMIT_SINGLE_FILE_PER_REQUEST', 100),
+        ],
+    ],
 ];

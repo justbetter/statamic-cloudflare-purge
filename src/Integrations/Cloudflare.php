@@ -23,7 +23,15 @@ class Cloudflare
             $options['purge_everything'] = true;
         } else {
             if ($files) {
-                $options['files'] = $files;
+                $rateLimit = config('cloudflare-purge.rate-limits.single-file.per-request', 100);
+                if (count($files) > $rateLimit) {
+                    // If there are more than N files, run them individually in chunks
+                    foreach (array_chunk($files, $rateLimit) as $chunk) {
+                        $this->purge($zone, $chunk);
+                    }
+                } else {
+                    $options['files'] = $files;
+                }
             }
             if ($tags) {
                 $options['tags'] = $tags;

@@ -49,7 +49,7 @@ Schedule::job(\JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCachesJob:
 ```
 
 > [!NOTE]
-> Be aware of the [rate limits on the API](https://developers.cloudflare.com/cache/how-to/purge-cache/#availability-and-limits). You're *probably* not going to run into any issues, but it's possible. Especially if you end up calling an everything-purge often and you're on a free plan, or have a lot of sites running on the same Cloudflare account.
+> Be aware of the [rate limits on the API](https://developers.cloudflare.com/cache/how-to/purge-cache/#availability-and-limits). This package handles single-request limits automatically, but it does not take into account the per-account limits. You're *probably* not going to run into any issues, but it's possible. Especially if you end up calling an everything-purge often and you're on a free plan, or have a lot of sites running on the same Cloudflare account.
 
 ## Configuration
 
