@@ -1,6 +1,13 @@
 # Changelog 
 
-[Unreleased changes](https://github.com/justbetter/statamic-cloudflare-purge/compare/2.0.0...2.0.0)
+[Unreleased changes](https://github.com/justbetter/statamic-cloudflare-purge/compare/2.1.0...2.1.0)
+## [2.1.0](https://github.com/justbetter/statamic-cloudflare-purge/releases/tag/2.1.0) - 2026-07-14
+
+### Added
+
+- Chunk single-file purges based on rate limit (#6)
+- Added base package & Changed PHP dependency (#5)
+
 ## [2.0.0](https://github.com/justbetter/statamic-cloudflare-purge/releases/tag/2.0.0) - 2026-03-26
 
 ### Added
