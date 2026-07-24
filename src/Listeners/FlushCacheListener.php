@@ -7,8 +7,12 @@ use JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCachesJob;
 
 class FlushCacheListener
 {
-    public function handle($event): void
+    public function handle(mixed $event): void
     {
+        if (! config('cloudflare-purge.enabled')) {
+            return;
+        }
+
         CloudflarePurge::appendZone();
 
         PurgeCloudflareCachesJob::dispatch(true);
