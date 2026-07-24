@@ -4,15 +4,20 @@ namespace JustBetter\StatamicCloudflarePurge;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
-use Statamic\Facades\Site;
+use Statamic\Facades\Site as SiteFacade;
+use Statamic\Sites\Site;
 
 class CloudflarePurge
 {
+    /**
+     * @return array<int, string>
+     */
     public static function getInvalidateUrls(?string $zone = null): array
     {
         $files = explode("\n", Storage::disk('local')->get(static::getStoragePath($zone)) ?? '');
 
-        return Arr::where($files, fn ($file) => $file);
+        /** @var array<int, string> */
+        return Arr::where($files, fn (string $file): bool => $file !== '');
     }
 
     public static function clearInvalidateUrls(?string $zone = null): void
@@ -22,18 +27,21 @@ class CloudflarePurge
         static::removeZone($zone);
     }
 
+    /**
+     * @return array<int, string>
+     */
     public static function popInvalidateUrls(?string $zone = null): array
     {
-        $files = static::GetInvalidateUrls($zone);
+        $files = static::getInvalidateUrls($zone);
 
-        static::ClearInvalidateUrls($zone);
+        static::clearInvalidateUrls($zone);
 
         return $files;
     }
 
     public static function appendInvalidateUrl(string $url, ?string $zone = null): void
     {
-        if (in_array($url, static::GetInvalidateUrls($zone))) {
+        if (in_array($url, static::getInvalidateUrls($zone), true)) {
             return;
         }
 
@@ -57,7 +65,7 @@ class CloudflarePurge
             $zone = static::getCurrentZone();
         }
 
-        if (in_array($zone, static::getZones())) {
+        if ($zone === null || in_array($zone, static::getZones(), true)) {
             return;
         }
 
@@ -70,8 +78,12 @@ class CloudflarePurge
             $zone = static::getCurrentZone();
         }
 
+        if ($zone === null) {
+            return;
+        }
+
         $zones = static::getZones();
-        $id = array_search($zone, $zones);
+        $id = array_search($zone, $zones, true);
 
         if ($id === false) {
             return;
@@ -82,11 +94,15 @@ class CloudflarePurge
         Storage::disk('local')->put('/.cloudflare-invalidate-zones', implode("\n", $zones));
     }
 
+    /**
+     * @return array<int, string>
+     */
     public static function getZones(): array
     {
         $zones = explode("\n", Storage::disk('local')->get('/.cloudflare-invalidate-zones') ?? '');
 
-        return Arr::where($zones, fn ($zone) => $zone);
+        /** @var array<int, string> */
+        return Arr::where($zones, fn (string $zone): bool => $zone !== '');
     }
 
     public static function getCurrentZone(): ?string
@@ -94,9 +110,25 @@ class CloudflarePurge
         $zone = config('cloudflare-purge.zone');
 
         if (is_array($zone)) {
-            return $zone[Site::current()->handle];
+            $site = SiteFacade::current();
+
+            if (! $site instanceof Site) {
+                return null;
+            }
+
+            $handle = $site->handle();
+
+            if (! is_string($handle)) {
+                return null;
+            }
+
+            $resolved = $zone[$handle] ?? null;
+
+            return is_string($resolved) ? $resolved : null;
         }
 
-        return value($zone);
+        $resolved = value($zone);
+
+        return is_string($resolved) ? $resolved : null;
     }
 }

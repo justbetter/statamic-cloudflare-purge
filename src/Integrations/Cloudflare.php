@@ -11,21 +11,29 @@ class Cloudflare
 {
     public function http(): PendingRequest
     {
-        return Http::baseUrl(config('cloudflare-purge.endpoint'))
-            ->withToken(config('cloudflare-purge.token'));
+        $endpoint = config('cloudflare-purge.endpoint');
+        $token = config('cloudflare-purge.token');
+
+        return Http::baseUrl(is_string($endpoint) ? $endpoint : '')
+            ->withToken(is_string($token) ? $token : '');
     }
 
+    /**
+     * @param  array<int, string>|null  $files
+     * @param  array<int, string>|null  $tags
+     * @param  array<int, string>|null  $hosts
+     */
     public function purge(string $zone, ?array $files = null, ?array $tags = null, ?array $hosts = null, bool $everything = false): bool
     {
+        /** @var array<string, mixed> $options */
         $options = [];
 
         if ($everything) {
             $options['purge_everything'] = true;
         } else {
             if ($files) {
-                $rateLimit = config('cloudflare-purge.rate-limits.single-file.per-request', 100);
+                $rateLimit = max(1, config()->integer('cloudflare-purge.rate-limits.single-file.per-request', 100));
                 if (count($files) > $rateLimit) {
-                    // If there are more than N files, run them individually in chunks
                     foreach (array_chunk($files, $rateLimit) as $chunk) {
                         $this->purge($zone, $chunk);
                     }
@@ -41,24 +49,26 @@ class Cloudflare
             }
         }
 
-        // Filter out non-arrays and empty arrays
-        $options = Arr::where($options, fn ($option) => is_array($option) && count($option));
+        $options = Arr::where(
+            $options,
+            fn (mixed $option): bool => $option === true || (is_array($option) && count($option) > 0)
+        );
 
-        // No need to continue when there's nothing to purge
-        if (! count($options)) {
+        if (count($options) === 0) {
             return true;
         }
 
-        if (! $zone) {
+        if ($zone === '') {
             throw new CloudflareException('No zone ID');
         }
 
+        /** @var array{success?: bool, errors?: list<array{code: int|string, message: string}>}|null $response */
         $response = $this->http()->post('zones/'.$zone.'/purge_cache', $options)->json();
 
         $success = $response['success'] ?? false;
         $errors = $response['errors'] ?? [];
 
-        if (count($errors)) {
+        if (count($errors) > 0) {
             $errorString = collect($errors)
                 ->map(fn (array $error): string => "{$error['code']}: {$error['message']}")
                 ->join("\n");

@@ -9,8 +9,8 @@ This addon will hook into your already existing statamic invalidation and purge 
 ## Requirements
 
 * PHP ^8.4
-* Laravel ^12.0
-* Statamic ^6.7
+* Laravel ^12.40 or ^13.0
+* Statamic ^6.0
 
 ## Installation
 
@@ -95,3 +95,11 @@ You can define any events that will trigger a full cache purge immediately in th
     \Statamic\Events\StaticCacheCleared::class,
 ],
 ```
+
+## Contributing
+
+Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
+
+## Security Vulnerabilities
+
+Please review [our security policy](.github/SECURITY.md) on how to report security vulnerabilities.
