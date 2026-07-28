@@ -27,8 +27,14 @@ class StatamicCloudflarePurgeServiceProvider extends AddonServiceProvider
 
     protected function bootListeners(): static
     {
-        if (config('cloudflare-purge.enabled')) {
-            Event::listen(config('cloudflare-purge.flush-events'), FlushCacheListener::class);
+        if (! config('cloudflare-purge.enabled')) {
+            return $this;
+        }
+
+        $events = config('cloudflare-purge.flush-events');
+
+        if (is_string($events) || is_array($events)) {
+            Event::listen($events, FlushCacheListener::class);
         }
 
         return $this;

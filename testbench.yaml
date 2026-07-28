@@ -1,0 +1,2 @@
+providers:
+    - JustBetter\StatamicCloudflarePurge\StatamicCloudflarePurgeServiceProvider
