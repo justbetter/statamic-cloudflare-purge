@@ -143,4 +143,114 @@ class CloudflarePurgeTest extends TestCase
         $this->assertSame([], array_values(CloudflarePurge::getInvalidateUrls('empty')));
         $this->assertSame([], array_values(CloudflarePurge::getZones()));
     }
+
+    #[Test]
+    public function it_appends_urls_to_the_zone_of_their_site(): void
+    {
+        $this->setUpMultisite();
+
+        CloudflarePurge::appendInvalidateUrl('https://example.de/a');
+        CloudflarePurge::appendInvalidateUrl('https://example.nl/b');
+        CloudflarePurge::appendInvalidateUrl('https://example.de/a');
+
+        $this->assertSame(['https://example.de/a'], array_values(CloudflarePurge::getInvalidateUrls('zone-de')));
+        $this->assertSame(['https://example.nl/b'], array_values(CloudflarePurge::getInvalidateUrls('zone-nl')));
+        $this->assertSame(['zone-de', 'zone-nl'], array_values(CloudflarePurge::getZones()));
+    }
+
+    #[Test]
+    public function it_skips_urls_without_a_zone(): void
+    {
+        $this->setUpMultisite();
+
+        CloudflarePurge::appendInvalidateUrl('https://unknown.com/a');
+        CloudflarePurge::appendInvalidateUrl('https://example.fr/a');
+
+        $this->assertSame([], array_values(CloudflarePurge::getInvalidateUrls('zone-nl')));
+        $this->assertSame([], array_values(CloudflarePurge::getZones()));
+    }
+
+    #[Test]
+    public function it_skips_urls_when_no_zone_is_configured(): void
+    {
+        config()->set('cloudflare-purge.zone', '');
+
+        CloudflarePurge::appendInvalidateUrl('https://example.com/a');
+
+        Storage::disk('local')->assertMissing('/.cloudflare-invalidate-urls-');
+        $this->assertSame([], array_values(CloudflarePurge::getZones()));
+    }
+
+    #[Test]
+    public function it_resolves_zone_by_url_from_site_map(): void
+    {
+        $this->setUpMultisite();
+
+        $this->assertSame('zone-de', CloudflarePurge::getZoneByUrl('https://example.de/a'));
+        $this->assertSame('zone-nl', CloudflarePurge::getZoneByUrl('https://example.nl/a'));
+        $this->assertNull(CloudflarePurge::getZoneByUrl('https://example.fr/a'));
+        $this->assertNull(CloudflarePurge::getZoneByUrl('https://unknown.com/a'));
+    }
+
+    #[Test]
+    public function it_returns_null_zone_by_url_when_site_handle_is_not_a_string(): void
+    {
+        config()->set('cloudflare-purge.zone', [
+            'default' => 'zone-default',
+        ]);
+
+        $site = $this->createStub(Site::class);
+        $site->method('handle')->willReturn(123);
+        SiteFacade::shouldReceive('findByUrl')->andReturn($site);
+
+        $this->assertNull(CloudflarePurge::getZoneByUrl('https://example.com/a'));
+    }
+
+    #[Test]
+    public function it_resolves_zone_by_url_from_string_and_callable(): void
+    {
+        $this->assertSame('test-zone', CloudflarePurge::getZoneByUrl('https://example.com/a'));
+
+        config()->set('cloudflare-purge.zone', fn (): string => 'callable-zone');
+
+        $this->assertSame('callable-zone', CloudflarePurge::getZoneByUrl('https://example.com/a'));
+    }
+
+    #[Test]
+    public function it_resolves_configured_zones(): void
+    {
+        $this->assertSame(['test-zone'], CloudflarePurge::getConfiguredZones());
+
+        config()->set('cloudflare-purge.zone', [
+            'nl' => 'zone-nl',
+            'be' => 'zone-nl',
+            'de' => 'zone-de',
+            'fr' => null,
+            'it' => '',
+        ]);
+
+        $this->assertSame(['zone-nl', 'zone-de'], CloudflarePurge::getConfiguredZones());
+
+        config()->set('cloudflare-purge.zone', fn (): string => 'callable-zone');
+
+        $this->assertSame(['callable-zone'], CloudflarePurge::getConfiguredZones());
+
+        config()->set('cloudflare-purge.zone', null);
+
+        $this->assertSame([], CloudflarePurge::getConfiguredZones());
+    }
+
+    protected function setUpMultisite(): void
+    {
+        SiteFacade::setSites([
+            'nl' => ['name' => 'NL', 'url' => 'https://example.nl/', 'locale' => 'nl_NL'],
+            'de' => ['name' => 'DE', 'url' => 'https://example.de/', 'locale' => 'de_DE'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.fr/', 'locale' => 'fr_FR'],
+        ]);
+
+        config()->set('cloudflare-purge.zone', [
+            'nl' => 'zone-nl',
+            'de' => 'zone-de',
+        ]);
+    }
 }

@@ -41,7 +41,9 @@ class CloudflarePurge
 
     public static function appendInvalidateUrl(string $url, ?string $zone = null): void
     {
-        if (in_array($url, static::getInvalidateUrls($zone), true)) {
+        $zone ??= static::getZoneByUrl($url);
+
+        if (! $zone || in_array($url, static::getInvalidateUrls($zone), true)) {
             return;
         }
 
@@ -103,6 +105,46 @@ class CloudflarePurge
 
         /** @var array<int, string> */
         return Arr::where($zones, fn (string $zone): bool => $zone !== '');
+    }
+
+    public static function getZoneByUrl(string $url): ?string
+    {
+        $zone = config('cloudflare-purge.zone');
+
+        if (! is_array($zone)) {
+            return static::getCurrentZone();
+        }
+
+        $site = SiteFacade::findByUrl($url);
+
+        if (! $site instanceof Site) {
+            return null;
+        }
+
+        $handle = $site->handle();
+
+        if (! is_string($handle)) {
+            return null;
+        }
+
+        $resolved = $zone[$handle] ?? null;
+
+        return is_string($resolved) ? $resolved : null;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public static function getConfiguredZones(): array
+    {
+        $zone = config('cloudflare-purge.zone');
+
+        $zones = array_filter(
+            is_array($zone) ? $zone : [value($zone)],
+            fn (mixed $zone): bool => is_string($zone) && $zone !== ''
+        );
+
+        return array_values(array_unique($zones));
     }
 
     public static function getCurrentZone(): ?string
