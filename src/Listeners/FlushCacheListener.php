@@ -13,7 +13,9 @@ class FlushCacheListener
             return;
         }
 
-        CloudflarePurge::appendZone();
+        foreach (CloudflarePurge::getConfiguredZones() as $zone) {
+            CloudflarePurge::appendZone($zone);
+        }
 
         PurgeCloudflareCachesJob::dispatch(true);
     }

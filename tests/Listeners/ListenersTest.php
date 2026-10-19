@@ -13,6 +13,7 @@ use PHPUnit\Framework\Attributes\Test;
 use ReflectionProperty;
 use Statamic\Events\StaticCacheCleared;
 use Statamic\Events\UrlInvalidated;
+use Statamic\Facades\Site as SiteFacade;
 
 class ListenersTest extends TestCase
 {
@@ -70,5 +71,41 @@ class ListenersTest extends TestCase
 
         $this->assertSame([], array_values(CloudflarePurge::getZones()));
         Bus::assertNothingDispatched();
+    }
+
+    #[Test]
+    public function url_invalidated_listener_appends_url_to_the_zone_of_its_site(): void
+    {
+        $this->setUpMultisite();
+
+        (new UrlInvalidatedListener)->handle(new UrlInvalidated('/page', 'https://example.de'));
+
+        $this->assertSame(['https://example.de/page'], array_values(CloudflarePurge::getInvalidateUrls('zone-de')));
+        $this->assertSame([], array_values(CloudflarePurge::getInvalidateUrls('zone-nl')));
+        $this->assertSame(['zone-de'], array_values(CloudflarePurge::getZones()));
+    }
+
+    #[Test]
+    public function flush_cache_listener_appends_all_configured_zones(): void
+    {
+        Bus::fake();
+        $this->setUpMultisite();
+
+        (new FlushCacheListener)->handle(new StaticCacheCleared);
+
+        $this->assertSame(['zone-nl', 'zone-de'], array_values(CloudflarePurge::getZones()));
+        Bus::assertDispatched(PurgeCloudflareCachesJob::class);
+    }
+
+    protected function setUpMultisite(): void
+    {
+        SiteFacade::setSites([
+            'nl' => ['name' => 'NL', 'url' => 'https://example.nl/', 'locale' => 'nl_NL'],
+            'de' => ['name' => 'DE', 'url' => 'https://example.de/', 'locale' => 'de_DE'],
+        ]);
+        config()->set('cloudflare-purge.zone', [
+            'nl' => 'zone-nl',
+            'de' => 'zone-de',
+        ]);
     }
 }
