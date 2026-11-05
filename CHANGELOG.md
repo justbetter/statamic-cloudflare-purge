@@ -1,6 +1,13 @@
 # Changelog 
 
-[Unreleased changes](https://github.com/justbetter/statamic-cloudflare-purge/compare/2.2.0...2.2.0)
+[Unreleased changes](https://github.com/justbetter/statamic-cloudflare-purge/compare/2.2.1...2.2.1)
+## [2.2.1](https://github.com/justbetter/statamic-cloudflare-purge/releases/tag/2.2.1) - 2026-11-05
+
+### Fixed
+
+- Break if all entries are null (#9)
+- Fix multisite issues (#8)
+
 ## [2.2.0](https://github.com/justbetter/statamic-cloudflare-purge/releases/tag/2.2.0) - 2026-07-28
 
 ### Added
