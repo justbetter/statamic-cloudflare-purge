@@ -31,6 +31,9 @@ class Cloudflare
         if ($everything) {
             $options['purge_everything'] = true;
         } else {
+            if (is_null($files) && is_null($tags) && is_null($hosts)) {
+                return true;
+            }
             if ($files) {
                 $rateLimit = max(1, config()->integer('cloudflare-purge.rate-limits.single-file.per-request', 100));
                 if (count($files) > $rateLimit) {
