@@ -28,6 +28,25 @@ class CloudflareTest extends TestCase
     }
 
     #[Test]
+    public function it_sends_non_sequential_arrays_as_json_lists(): void
+    {
+        Http::fake([
+            'api.cloudflare.com/*' => Http::response(['success' => true, 'errors' => []]),
+        ]);
+
+        (new Cloudflare)->purge(
+            'zone-1',
+            files: [1 => 'https://example.com/a', 3 => 'https://example.com/b'],
+            tags: [2 => 'tag-a'],
+            hosts: [5 => 'example.com'],
+        );
+
+        Http::assertSent(fn ($request): bool => $request['files'] === ['https://example.com/a', 'https://example.com/b']
+            && $request['tags'] === ['tag-a']
+            && $request['hosts'] === ['example.com']);
+    }
+
+    #[Test]
     public function it_purges_tags_and_hosts(): void
     {
         Http::fake([

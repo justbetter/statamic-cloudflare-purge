@@ -17,7 +17,7 @@ class CloudflarePurge
         $files = explode("\n", Storage::disk('local')->get(static::getStoragePath($zone)) ?? '');
 
         /** @var array<int, string> */
-        return Arr::where($files, fn (string $file): bool => $file !== '');
+        return array_values(Arr::where($files, fn (string $file): bool => $file !== ''));
     }
 
     public static function clearInvalidateUrls(?string $zone = null): void
@@ -104,7 +104,7 @@ class CloudflarePurge
         $zones = explode("\n", Storage::disk('local')->get('/.cloudflare-invalidate-zones') ?? '');
 
         /** @var array<int, string> */
-        return Arr::where($zones, fn (string $zone): bool => $zone !== '');
+        return array_values(Arr::where($zones, fn (string $zone): bool => $zone !== ''));
     }
 
     public static function getZoneByUrl(string $url): ?string

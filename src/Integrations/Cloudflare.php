@@ -41,14 +41,14 @@ class Cloudflare
                         $this->purge($zone, $chunk);
                     }
                 } else {
-                    $options['files'] = $files;
+                    $options['files'] = array_values($files);
                 }
             }
             if ($tags) {
-                $options['tags'] = $tags;
+                $options['tags'] = array_values($tags);
             }
             if ($hosts) {
-                $options['hosts'] = $hosts;
+                $options['hosts'] = array_values($hosts);
             }
         }
 
