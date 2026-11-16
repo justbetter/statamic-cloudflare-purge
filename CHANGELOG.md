@@ -1,6 +1,11 @@
 # Changelog 
 
-[Unreleased changes](https://github.com/justbetter/statamic-cloudflare-purge/compare/2.2.1...2.2.1)
+[Unreleased changes](https://github.com/justbetter/statamic-cloudflare-purge/compare/2.2.2...2.2.2)
+## [2.2.2](https://github.com/justbetter/statamic-cloudflare-purge/releases/tag/2.2.2) - 2026-11-16
+
+### Fixed
+- Send purge payload values as JSON arrays (#10)
+
 ## [2.2.1](https://github.com/justbetter/statamic-cloudflare-purge/releases/tag/2.2.1) - 2026-11-05
 
 ### Fixed
