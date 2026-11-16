@@ -33,6 +33,25 @@ class CloudflarePurgeTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_invalidate_urls_as_a_list_when_the_file_contains_blank_lines(): void
+    {
+        Storage::disk('local')->put(CloudflarePurge::getStoragePath('zone-a'), "\nhttps://example.com/a\n\nhttps://example.com/b\n");
+
+        $this->assertSame(
+            ['https://example.com/a', 'https://example.com/b'],
+            CloudflarePurge::getInvalidateUrls('zone-a')
+        );
+    }
+
+    #[Test]
+    public function it_returns_zones_as_a_list_when_the_file_contains_blank_lines(): void
+    {
+        Storage::disk('local')->put('/.cloudflare-invalidate-zones', "\nzone-a\n\nzone-b");
+
+        $this->assertSame(['zone-a', 'zone-b'], CloudflarePurge::getZones());
+    }
+
+    #[Test]
     public function it_pops_and_clears_invalidate_urls(): void
     {
         CloudflarePurge::appendInvalidateUrl('https://example.com/a', 'zone-a');
