@@ -3,6 +3,7 @@
 namespace JustBetter\StatamicCloudflarePurge\Commands;
 
 use Illuminate\Console\Command;
+use JustBetter\StatamicCloudflarePurge\Facades\CloudflarePurge as CloudflarePurgeFacade;
 use JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCachesJob;
 
 class PurgeCommand extends Command
@@ -13,7 +14,7 @@ class PurgeCommand extends Command
 
     public function handle(): int
     {
-        if (! config('cloudflare-purge.enabled')) {
+        if (! CloudflarePurgeFacade::isEnabled()) {
             $this->info('Purging has been disabled.');
 
             return static::FAILURE;

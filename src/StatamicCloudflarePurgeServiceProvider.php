@@ -27,7 +27,7 @@ class StatamicCloudflarePurgeServiceProvider extends AddonServiceProvider
 
     protected function bootListeners(): static
     {
-        if (! config('cloudflare-purge.enabled')) {
+        if (! CloudflarePurge::isEnabled()) {
             return $this;
         }
 

@@ -2,19 +2,19 @@
 
 namespace JustBetter\StatamicCloudflarePurge\Listeners;
 
-use JustBetter\StatamicCloudflarePurge\Facades\CloudflarePurge;
+use JustBetter\StatamicCloudflarePurge\Facades\CloudflarePurge as CloudflarePurgeFacade;
 use JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCachesJob;
 
 class FlushCacheListener
 {
     public function handle(mixed $event): void
     {
-        if (! config('cloudflare-purge.enabled')) {
+        if (! CloudflarePurgeFacade::isEnabled()) {
             return;
         }
 
-        foreach (CloudflarePurge::getConfiguredZones() as $zone) {
-            CloudflarePurge::appendZone($zone);
+        foreach (CloudflarePurgeFacade::getConfiguredZones() as $zone) {
+            CloudflarePurgeFacade::appendZone($zone);
         }
 
         PurgeCloudflareCachesJob::dispatch(true);

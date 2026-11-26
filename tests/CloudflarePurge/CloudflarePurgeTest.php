@@ -5,6 +5,7 @@ namespace JustBetter\StatamicCloudflarePurge\Tests\CloudflarePurge;
 use Illuminate\Support\Facades\Storage;
 use JustBetter\StatamicCloudflarePurge\CloudflarePurge;
 use JustBetter\StatamicCloudflarePurge\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site as SiteFacade;
 use Statamic\Sites\Site;
@@ -16,6 +17,51 @@ class CloudflarePurgeTest extends TestCase
         parent::setUp();
 
         Storage::fake('local');
+    }
+
+    #[Test]
+    #[DataProvider('enabledValues')]
+    public function it_determines_whether_purging_is_enabled(mixed $value, bool $expected): void
+    {
+        config()->set('cloudflare-purge.enabled', $value);
+
+        $this->assertSame($expected, CloudflarePurge::isEnabled());
+    }
+
+    /**
+     * @return array<string, array{mixed, bool}>
+     */
+    public static function enabledValues(): array
+    {
+        return [
+            'true' => [true, true],
+            'string true' => ['true', true],
+            'string 1' => ['1', true],
+            'false' => [false, false],
+            'string false' => ['false', false],
+            'string 0' => ['0', false],
+            'null' => [null, false],
+        ];
+    }
+
+    #[Test]
+    public function it_does_not_append_invalidate_urls_when_disabled(): void
+    {
+        config()->set('cloudflare-purge.enabled', false);
+
+        CloudflarePurge::appendInvalidateUrl('https://example.com/a');
+
+        $this->assertSame([], Storage::disk('local')->allFiles());
+    }
+
+    #[Test]
+    public function it_does_not_append_zones_when_disabled(): void
+    {
+        config()->set('cloudflare-purge.enabled', false);
+
+        CloudflarePurge::appendZone('test-zone');
+
+        $this->assertSame([], Storage::disk('local')->allFiles());
     }
 
     #[Test]

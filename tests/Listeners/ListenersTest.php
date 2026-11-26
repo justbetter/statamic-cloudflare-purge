@@ -9,6 +9,7 @@ use JustBetter\StatamicCloudflarePurge\Jobs\PurgeCloudflareCachesJob;
 use JustBetter\StatamicCloudflarePurge\Listeners\FlushCacheListener;
 use JustBetter\StatamicCloudflarePurge\Listeners\UrlInvalidatedListener;
 use JustBetter\StatamicCloudflarePurge\Tests\TestCase;
+use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Test;
 use ReflectionProperty;
 use Statamic\Events\StaticCacheCleared;
@@ -40,11 +41,33 @@ class ListenersTest extends TestCase
     #[Test]
     public function url_invalidated_listener_skips_when_disabled(): void
     {
-        config()->set('cloudflare-purge.enabled', false);
+        $this->mock(CloudflarePurge::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('isEnabled')->once()->andReturnFalse();
+            $mock->shouldNotReceive('appendInvalidateUrl');
+        });
 
         (new UrlInvalidatedListener)->handle(new UrlInvalidated('/page'));
+    }
 
-        $this->assertSame([], array_values(CloudflarePurge::getInvalidateUrls()));
+    #[Test]
+    public function dispatching_url_invalidated_does_nothing_when_disabled_and_no_zone_is_configured(): void
+    {
+        config()->set('cloudflare-purge.enabled', false);
+        config()->set('cloudflare-purge.zone', null);
+
+        event(new UrlInvalidated('/page', 'https://example.com'));
+
+        $this->assertSame([], Storage::disk('local')->allFiles());
+    }
+
+    #[Test]
+    public function dispatching_url_invalidated_does_nothing_when_no_zone_is_configured(): void
+    {
+        config()->set('cloudflare-purge.zone', null);
+
+        event(new UrlInvalidated('/page', 'https://example.com'));
+
+        $this->assertSame([], Storage::disk('local')->allFiles());
     }
 
     #[Test]
