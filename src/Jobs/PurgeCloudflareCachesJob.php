@@ -4,7 +4,7 @@ namespace JustBetter\StatamicCloudflarePurge\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use JustBetter\StatamicCloudflarePurge\Facades\CloudflarePurge;
+use JustBetter\StatamicCloudflarePurge\Facades\CloudflarePurge as CloudflarePurgeFacade;
 use JustBetter\StatamicCloudflarePurge\Integrations\Cloudflare;
 
 class PurgeCloudflareCachesJob implements ShouldQueue
@@ -15,12 +15,12 @@ class PurgeCloudflareCachesJob implements ShouldQueue
 
     public function handle(Cloudflare $cloudflare): void
     {
-        if (! config('cloudflare-purge.enabled')) {
+        if (! CloudflarePurgeFacade::isEnabled()) {
             return;
         }
 
-        foreach (CloudflarePurge::getZones() as $zone) {
-            $files = CloudflarePurge::popInvalidateUrls($zone);
+        foreach (CloudflarePurgeFacade::getZones() as $zone) {
+            $files = CloudflarePurgeFacade::popInvalidateUrls($zone);
 
             $cloudflare->purge($zone, everything: $this->all, files: $files);
         }

@@ -9,6 +9,11 @@ use Statamic\Sites\Site;
 
 class CloudflarePurge
 {
+    public static function isEnabled(): bool
+    {
+        return filter_var(config('cloudflare-purge.enabled'), FILTER_VALIDATE_BOOLEAN);
+    }
+
     /**
      * @return array<int, string>
      */
@@ -41,6 +46,10 @@ class CloudflarePurge
 
     public static function appendInvalidateUrl(string $url, ?string $zone = null): void
     {
+        if (! static::isEnabled()) {
+            return;
+        }
+
         $zone ??= static::getZoneByUrl($url);
 
         if (! $zone || in_array($url, static::getInvalidateUrls($zone), true)) {
@@ -63,6 +72,10 @@ class CloudflarePurge
 
     public static function appendZone(?string $zone = null): void
     {
+        if (! static::isEnabled()) {
+            return;
+        }
+
         if (! $zone) {
             $zone = static::getCurrentZone();
         }

@@ -22,10 +22,10 @@ class PurgeCloudflareCachesJobTest extends TestCase
     #[Test]
     public function it_does_nothing_when_disabled(): void
     {
+        CloudflarePurge::appendInvalidateUrl('https://example.com', 'zone-1');
         config()->set('cloudflare-purge.enabled', false);
 
         Http::fake();
-        CloudflarePurge::appendInvalidateUrl('https://example.com', 'zone-1');
 
         (new PurgeCloudflareCachesJob)->handle(new Cloudflare);
 
